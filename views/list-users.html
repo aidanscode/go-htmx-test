@@ -1,0 +1,8 @@
+{{define "list-users"}}
+  <h2>Users:</h2>
+  <ul id="users-list">
+    {{range .}}
+      {{template "user" .}}
+    {{end}}
+  </ul>
+{{end}}

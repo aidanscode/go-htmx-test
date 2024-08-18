@@ -1,0 +1,15 @@
+{{define "add-user"}}
+<form id="add-user" hx-post="/user" hx-target="#users-list" hx-swap="beforeend" hx-on::after-request="this.reset()">
+  <div>
+    <label for="name-input">Name</label>
+    <input id="name-input" name="name" type="text" placeholder="User name (ex: Bob)" required />
+  </div>
+
+  <div style="margin: 10px 0px">
+    <label for="email-input">Email</label>
+    <input id="email-input" name="email" type="email" placeholder="Email (ex: bob@example.com)" required />
+  </div>
+
+  <button type="submit">Save User</button>
+</form>
+{{end}}

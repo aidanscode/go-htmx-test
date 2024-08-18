@@ -1,10 +1,9 @@
 package http
 
 import (
-	"fmt"
+	"html/template"
 	"io"
 	"net/http"
-	"text/template"
 
 	"github.com/labstack/echo/v4"
 )
@@ -17,6 +16,19 @@ func (r *Renderer) Render(w io.Writer, name string, data interface{}, con echo.C
 	return r.templates.ExecuteTemplate(w, name, data)
 }
 
+type User struct {
+	Name string
+	Email string
+}
+
+type IndexData struct {
+	Users []User
+}
+
+func NewIndexData(users []User) *IndexData {
+	return &IndexData{Users: users}
+}
+
 func Start() {
 	server := echo.New()
 	renderer := &Renderer{
@@ -24,23 +36,20 @@ func Start() {
 	}
 	server.Renderer = renderer
 
+	users := make([]User, 0)
+	users = append(users, User{Name: "Aidan", Email: "e@mail.com"})
+
+	server.Static("/static", "static")
+
 	server.GET("/", func(con echo.Context) error {
-		return con.String(http.StatusOK, "Hello, Go World!")
+		return con.Render(http.StatusOK, "index", NewIndexData(users))
 	})
 
-	server.GET("/users/:id", func(con echo.Context) error {
-		id := con.Param("id")
-		return con.String(http.StatusOK, fmt.Sprintf("Viewing profile for user: %s", id))
-	})
-
-	server.POST("/users", func(con echo.Context) error {
-		email := con.FormValue("email")
-		password := con.FormValue("password")
-		return con.String(http.StatusOK, fmt.Sprintf("Creating user with email=\"%v\", password=\"%v\"", email, password))
-	})
-
-	server.GET("/secret", func(con echo.Context) error {
-		return con.Render(http.StatusOK, "secret", "password123")
+	server.POST("/user", func(con echo.Context) error {
+		//fmt.Println(con.FormParams())
+		newUser := User{Name: con.FormValue("name"), Email: con.FormValue("email")}
+		users = append(users, newUser)
+		return con.Render(http.StatusCreated, "user", newUser)
 	})
 
 	server.Logger.Fatal(server.Start(":8000"))
