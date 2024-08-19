@@ -3,7 +3,7 @@
   <div style="display: flex; flex-direction: column; border: 1px solid #000; margin-bottom: 10px;">
     <span style="width: fit-content">{{.Name}}</span>
     <span style="width: fit-content">{{.Email}}</span>
-    <form hx-delete="/user" hx-target="closest .user" hx-swap="outerHTML">
+    <form hx-delete="/user" hx-confirm="Are you sure you'd like to delete this user?" hx-target="closest .user" hx-swap="outerHTML">
       <input type="hidden" name="email" value="{{.Email}}" />
       <button role="button" style="width: fit-content">Delete</button>
     </form>
