@@ -12,6 +12,15 @@
     {{template "add-user"}}
     <hr />
     {{template "list-users" .Users}}
+    <script>
+      document.body.addEventListener('htmx:beforeOnLoad', function (evt) {
+        const status = evt.detail.xhr.status
+        if (status >= 400 && status < 500) {
+            evt.detail.shouldSwap = true;
+            evt.detail.isError = false;
+        }
+      });
+    </script>
   </body>
 </html>
 {{end}}
