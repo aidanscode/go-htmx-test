@@ -24,19 +24,20 @@ type User struct {
 
 type IndexData struct {
 	Users []User
+	CreateUserData *CreateUserData
 }
 
-func NewIndexData(users []User) *IndexData {
-	return &IndexData{Users: users}
+func newIndexData(users []User, createUserData *CreateUserData) *IndexData {
+	return &IndexData{Users: users, CreateUserData: createUserData}
 }
 
 type CreateUserData struct {
-	Name string
-	Email string
-	ErrorMessage string
+	Name *string
+	Email *string
+	ErrorMessage *string
 }
 
-func NewCreateUserData(name, email, errorMessage string) *CreateUserData {
+func newCreateUserData(name, email, errorMessage *string) *CreateUserData {
 	return &CreateUserData{Name: name, Email: email, ErrorMessage: errorMessage}
 }
 
@@ -53,7 +54,7 @@ func Start() {
 	server.Static("/static", "static")
 
 	server.GET("/", func(con echo.Context) error {
-		return con.Render(http.StatusOK, "index", NewIndexData(users))
+		return con.Render(http.StatusOK, "index", newIndexData(users, nil))
 	})
 
 	server.POST("/user", func(con echo.Context) error {
@@ -62,17 +63,19 @@ func Start() {
 
 		_, err := findUserIdWithEmail(email, users)
 		if (err == nil) {
-			return con.Render(http.StatusUnprocessableEntity, "add-user", NewCreateUserData(name, email, "User already exists with given email"))
+			errorMsg := "User already exists with given email"
+			return con.Render(http.StatusUnprocessableEntity, "add-user", newCreateUserData(&name, &email, &errorMsg))
 		}
 
 		newUser := User{Name: name, Email: email}
 		users = append(users, newUser)
+		con.Render(http.StatusCreated, "add-user", newCreateUserData(nil, nil, nil))
 		return con.Render(http.StatusCreated, "user", newUser)
 	})
 
 	server.DELETE("/user", func(con echo.Context) error {
 		emailToDelete := con.FormValue("email")
-		
+
 		userIndex, err := findUserIdWithEmail(emailToDelete, users)
 		if (err != nil) {
 			return con.HTML(http.StatusNotFound, "<span>No user found with given email</span>")

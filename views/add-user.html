@@ -1,21 +1,18 @@
 {{define "add-user"}}
-<form id="add-user" hx-post="/user" hx-target="#users-list" hx-swap="beforeend" hx-on::after-request="this.reset()">
+<form id="add-user" hx-post="/user" hx-target="#users-list" hx-swap="beforeend" hx-swap-oob="true">
   <div>
     <label for="name-input">Name</label>
-    <input id="name-input" name="name" type="text" placeholder="User name (ex: Bob)" value="{{.Name}}" required />
+    <input id="name-input" name="name" type="text" placeholder="User name (ex: Bob)" {{if ne .Name nil}}value="{{.Name}}"{{end}} required />
   </div>
 
   <div style="margin: 10px 0px">
     <label for="email-input">Email</label>
-    <input id="email-input" name="email" type="email" placeholder="Email (ex: bob@example.com)" value="{{.Email}}" required />
+    <input id="email-input" name="email" type="email" placeholder="Email (ex: bob@example.com)" {{if ne .Email nil}}value="{{.Email}}"{{end}} required />
   </div>
 
   <button type="submit">Save User</button>
-
   {{if ne .ErrorMessage nil}}
-    not nil
-  {{else}}
-    is nil
+    <span style="color: red;">{{.ErrorMessage}}</span>
   {{end}}
 </form>
 {{end}}
